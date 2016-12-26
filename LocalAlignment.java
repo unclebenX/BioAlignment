@@ -2,7 +2,7 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
-class AffinePenalty
+class LocalAlignment
 {
   static int OPENING_GAP_PENALTY = 10;
   static int INCREASING_GAP_PENALTY = 1;
@@ -11,7 +11,37 @@ class AffinePenalty
   {
     String s1 = args[0];
     String s2 = args[1];
-    optimalAlignment(s1, s2);
+    localAlignmentScore(s1, s2);
+  }
+
+  public static void localAlignmentScore(String s1, String s2)
+  {
+    int m = s1.length(); int n = s2.length();
+    int score, best_score, best_i, best_j, best_k, best_l;
+    best_score = best_i = best_j = best_k = best_l = 0;
+    for(int i=0; i<m; i++)
+    {
+      for(int j=i+1; j<m; j++)
+      {
+        for(int k=0; k<n; k++)
+        {
+          for(int l=k+1; l<n; l++)
+          {
+            score = optimalAlignmentScore(s1.substring(i,j), s2.substring(k,l));
+            if(score > best_score)
+            {
+              best_score = score;
+              best_i = i;
+              best_j = j;
+              best_k = k;
+              best_l = l;
+            }
+          }
+        }
+      }
+    }
+    System.out.println("Optimal indices: (" + best_i + ", " + best_j + "), (" + best_k + ", " + best_l + ")");
+    displayOptimalAlignment(s1.substring(best_i, best_j), s2.substring(best_k, best_l));
   }
 
   public static void dispMatrix(String[][] tab)
@@ -23,7 +53,42 @@ class AffinePenalty
     return;
   }
 
-  public static int[][] optimalAlignment(String s1, String s2)
+  public static int optimalAlignmentScore(String s1, String s2)
+  {
+      int m = s1.length();
+      int n = s2.length();
+      int[][] tab = new int[m+1][n+1];
+      boolean[][] inGap = new boolean[m+1][n+1];
+      String[][] origin = new String[m+1][n+1];
+      /*Prefilling tab*/
+      for(int i=1; i<=m; i++) { origin[i][0] = "Top"; }
+      for(int j=1; j<=n; j++) { origin[0][j] = "Left"; }
+      /* Computing the optimal alignments of subsequences */
+      for (int i=1; i<=m; i++)
+      {
+        for (int j=1; j<=n; j++)
+        {
+            int score1 = tab[i-1][j-1]+Blosum50.getScore(s1.charAt(i-1),s2.charAt(j-1));
+            int score2 = tab[i-1][j]+Blosum50.getScore(s1.charAt(i-1),'-')+getPenalty(i-1,j,inGap);
+            int score3 = tab[i][j-1]+Blosum50.getScore(s2.charAt(j-1),'-')+getPenalty(i,j-1,inGap);
+            tab[i][j] = Math.max(Math.max(score1,score2),score3);
+            if(tab[i][j] == tab[i-1][j-1]+Blosum50.getScore(s1.charAt(i-1),s2.charAt(j-1))) { origin[i][j] = "TopLeft"; }
+            if(tab[i][j] == tab[i-1][j]+Blosum50.getScore(s1.charAt(i-1),'-')+getPenalty(i-1,j,inGap))
+            {
+              origin[i][j] = "Top";
+              if(getPenalty(i-1,j,inGap)<0) { inGap[i][j] = true; }
+            }
+            if(tab[i][j] == tab[i][j-1]+Blosum50.getScore(s2.charAt(j-1),'-')+getPenalty(i,j-1,inGap))
+            {
+              origin[i][j] = "Left";
+              if(getPenalty(i,j-1,inGap)<0) { inGap[i][j] = true; }
+            }
+        }
+      }
+      return tab[m][n];
+  }
+
+  public static void displayOptimalAlignment(String s1, String s2)
   {
       int m = s1.length();
       int n = s2.length();
@@ -57,7 +122,6 @@ class AffinePenalty
       }
       dispAlignment(s1,s2,origin);
       System.out.println("Alignment score: " + tab[m][n]);
-      return tab;
   }
 
   public static int getPenalty(int i, int j, boolean[][] inGap)

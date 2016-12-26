@@ -2,11 +2,8 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
-class AffinePenalty
+class Alignment
 {
-  static int OPENING_GAP_PENALTY = 10;
-  static int INCREASING_GAP_PENALTY = 1;
-
   public static void main(String[] args)
   {
     String s1 = args[0];
@@ -28,7 +25,6 @@ class AffinePenalty
       int m = s1.length();
       int n = s2.length();
       int[][] tab = new int[m+1][n+1];
-      boolean[][] inGap = new boolean[m+1][n+1];
       String[][] origin = new String[m+1][n+1];
       /*Prefilling tab*/
       for(int i=1; i<=m; i++) { origin[i][0] = "Top"; }
@@ -38,40 +34,22 @@ class AffinePenalty
       {
         for (int j=1; j<=n; j++)
         {
-            int score1 = tab[i-1][j-1]+Blosum50.getScore(s1.charAt(i-1),s2.charAt(j-1));
-            int score2 = tab[i-1][j]+Blosum50.getScore(s1.charAt(i-1),'-')+getPenalty(i-1,j,inGap);
-            int score3 = tab[i][j-1]+Blosum50.getScore(s2.charAt(j-1),'-')+getPenalty(i,j-1,inGap);
-            tab[i][j] = Math.max(Math.max(score1,score2),score3);
-            if(tab[i][j] == tab[i-1][j-1]+Blosum50.getScore(s1.charAt(i-1),s2.charAt(j-1))) { origin[i][j] = "TopLeft"; }
-            if(tab[i][j] == tab[i-1][j]+Blosum50.getScore(s1.charAt(i-1),'-')+getPenalty(i-1,j,inGap))
-            {
-              origin[i][j] = "Top";
-              if(getPenalty(i-1,j,inGap)<0) { inGap[i][j] = true; }
-            }
-            if(tab[i][j] == tab[i][j-1]+Blosum50.getScore(s2.charAt(j-1),'-')+getPenalty(i,j-1,inGap))
-            {
-              origin[i][j] = "Left";
-              if(getPenalty(i,j-1,inGap)<0) { inGap[i][j] = true; }
-            }
+          if(s1.charAt(i-1)==s2.charAt(j-1))
+          {
+            tab[i][j] = Math.max(Math.max(tab[i-1][j-1]+1, tab[i-1][j]), tab[i][j-1]);
+            if(tab[i][j] == tab[i-1][j-1]+1) { origin[i][j] = "TopLeft"; }
+            if(tab[i][j] == tab[i-1][j]) { origin[i][j] = "Top"; }
+            if(tab[i][j] == tab[i][j-1]) { origin[i][j] = "Left"; }
+          } else {
+            tab[i][j] = Math.max(Math.max(tab[i-1][j-1], tab[i-1][j]), tab[i][j-1]);
+            if(tab[i][j] == tab[i-1][j-1]) { origin[i][j] = "TopLeft"; }
+            if(tab[i][j] == tab[i-1][j]) { origin[i][j] = "Top"; }
+            if(tab[i][j] == tab[i][j-1]) { origin[i][j] = "Left"; }
+          }
         }
       }
       dispAlignment(s1,s2,origin);
-      System.out.println("Alignment score: " + tab[m][n]);
       return tab;
-  }
-
-  public static int getPenalty(int i, int j, boolean[][] inGap)
-  {
-    if(i==0 || j==0)
-    {
-      return 0;
-    }
-    if(inGap[i][j]==true)
-    {
-      return 0-INCREASING_GAP_PENALTY;
-    } else {
-      return 0-OPENING_GAP_PENALTY;
-    }
   }
 
   public static void dispAlignment(String s1, String s2, String[][] origin)
@@ -85,6 +63,7 @@ class AffinePenalty
       if(origin[i][j] == "Left") { s2x = s2.charAt(j-1) + s2x; s1x = '-' + s1x; j--; }
     }
     printAlignment(s1x, s2x);
+    System.out.println("Alignment score: " + score(s1x,s2x));
   }
 
   public static void printAlignment(String s1, String s2)
@@ -112,5 +91,16 @@ class AffinePenalty
       }
     }
     System.out.printf("%n");
+  }
+
+  public static int score(String s1, String s2)
+  {
+    int n = s1.length();
+    int score = 0;
+    for(int i=0; i<n; i++)
+    {
+      if(s1.charAt(i)==s2.charAt(i)) { score++; }
+    }
+    return score;
   }
 }
