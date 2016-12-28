@@ -2,7 +2,7 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
-class Alignment
+class BasicAlignment
 {
   public static void main(String[] args)
   {

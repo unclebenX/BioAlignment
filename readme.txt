@@ -17,3 +17,4 @@ java BLAST string1 string2 th thl
 
 2D H-P protein folding:
 java OptimalFolding string1 string2
+
