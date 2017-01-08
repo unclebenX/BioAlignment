@@ -6,6 +6,7 @@ class BasicAlignment
 {
   public static void main(String[] args)
   {
+    //Getting the arguments.
     String s1 = args[0];
     String s2 = args[1];
     optimalAlignment(s1, s2);
@@ -13,6 +14,7 @@ class BasicAlignment
 
   public static void dispMatrix(String[][] tab)
   {
+    //A simple yet useful function that displays a String matrix.
     for(int i=0; i<tab.length; i++)
     {
       System.out.println(Arrays.toString(tab[i]));
@@ -34,6 +36,7 @@ class BasicAlignment
       {
         for (int j=1; j<=n; j++)
         {
+          //Iteratively filling the tables, read the report for more info on this part and the equations used.
           if(s1.charAt(i-1)==s2.charAt(j-1))
           {
             tab[i][j] = Math.max(Math.max(tab[i-1][j-1]+1, tab[i-1][j]), tab[i][j-1]);
@@ -48,12 +51,14 @@ class BasicAlignment
           }
         }
       }
+      //Displaying the alignment.
       dispAlignment(s1,s2,origin);
       return tab;
   }
 
   public static void dispAlignment(String s1, String s2, String[][] origin)
   {
+    //Displays the optimal alignment by going back through the origin matrix.
     String s1x = ""; String s2x = "";
     int i = s1.length(); int j = s2.length();
     while(i>0 || j>0)
@@ -68,9 +73,11 @@ class BasicAlignment
 
   public static void printAlignment(String s1, String s2)
   {
+    //Displays an alignment in a fancy way - uses Unix ANSI codes that might not work on Windows.
     int n = s1.length();
     String ANSI_RESET = "\u001B[0m";
     String ANSI_GREEN = "\u001B[32m";
+    //Displaying the first string.
     for(int i=0; i<n; i++)
     {
       if(s1.charAt(i)==s2.charAt(i))
@@ -81,6 +88,7 @@ class BasicAlignment
       }
     }
     System.out.printf("%n");
+    //Displaying the second string.
     for(int i=0; i<n; i++)
     {
       if(s1.charAt(i)==s2.charAt(i))
@@ -95,6 +103,7 @@ class BasicAlignment
 
   public static int score(String s1, String s2)
   {
+    //Calculating the score of an alignment.
     int n = s1.length();
     int score = 0;
     for(int i=0; i<n; i++)

@@ -2,6 +2,8 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
+//Remark: Excepted the use of the Blosum50 Matrix to build the scores, the algorithm we use here is exactly the same as the one used in BasicAlignment.java.
+
 class Alignment
 {
   public static void main(String[] args)

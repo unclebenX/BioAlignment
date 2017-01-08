@@ -2,6 +2,7 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
+//Goal: finding the longest common subsequence of two strings.
 class LCS
 {
   public static void main(String[] args)
@@ -13,7 +14,9 @@ class LCS
     System.out.println(ss.length());
   }
 
-  public static String reverse(String input){
+  public static String reverse(String input)
+  //A simple function used to reverse strings.
+  {
     char[] in = input.toCharArray();
     int begin=0;
     int end=in.length-1;
@@ -30,6 +33,7 @@ class LCS
 
   public static String readSubstring(String s1, String[][] origin)
   {
+    //Reading the longest common subsequence from string s1 by going backwards in the matrix.
     int m = origin.length - 1;
     if(m==0) { return ""; }
     int n = origin[0].length - 1;
@@ -41,12 +45,14 @@ class LCS
       if(origin[i][j] == "Left") { j--; }
       if(origin[i][j] == "Top") { i--; }
     }
+    //We just have to reverse the string to return it in the right order.
     substring = reverse(substring);
     return substring;
   }
 
   public static String LCS(String s1, String s2)
   {
+      //Processing the longest common substring of s1 and s2.
       int m = s1.length();
       int n = s2.length();
       int[][] tab = new int[m+1][n+1];
@@ -56,6 +62,7 @@ class LCS
       {
         for (int j=1; j<=n; j++)
         {
+          //Iteratively filling the matrices - Please read the PDF report for more details.
           if(s1.charAt(i-1)==s2.charAt(j-1))
           {
             tab[i][j] = tab[i-1][j-1] + 1; origin[i][j] = "TopLeft";
@@ -69,6 +76,7 @@ class LCS
           }
         }
       }
+      //Dynamically building the substring using the "origin" matrix.
       String substring = readSubstring(s1, origin);
       return substring;
   }

@@ -2,6 +2,8 @@ import java.util.*;
 import java.lang.Math;
 import java.util.Arrays;
 
+//THIS FILE IS EXACTLY THE SAME AS AffinePenalty.java - EXCEPT FOR THE localAlignmentScore FUNCTION. PLEASE READ THIS FILE FOR MORE DETAILS.
+
 class LocalAlignment
 {
   static int OPENING_GAP_PENALTY = 10;
@@ -11,11 +13,24 @@ class LocalAlignment
   {
     String s1 = args[0];
     String s2 = args[1];
+    int OGP = Integer.parseInt(args[2]);
+    int IGP = Integer.parseInt(args[3]);
+    AffinePenalty.setGapPenalties(OGP, IGP);
     localAlignmentScore(s1, s2);
   }
 
+  //Setting the penalties using the arguments.
+  public static void setGapPenalties(int OGP, int IGP)
+  {
+    AffinePenalty.OPENING_GAP_PENALTY = OGP;
+    AffinePenalty.INCREASING_GAP_PENALTY = IGP;
+    return;
+  }
+
+
   public static void localAlignmentScore(String s1, String s2)
   {
+    //Iteratively calculating the best local alignments.
     int m = s1.length(); int n = s2.length();
     int score, best_score, best_i, best_j, best_k, best_l;
     best_score = best_i = best_j = best_k = best_l = 0;
@@ -27,6 +42,7 @@ class LocalAlignment
         {
           for(int l=k+1; l<n; l++)
           {
+            //We simply have to iterate the previous process on all possible substrings.
             score = optimalAlignmentScore(s1.substring(i,j), s2.substring(k,l));
             if(score > best_score)
             {
